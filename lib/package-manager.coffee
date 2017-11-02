@@ -146,7 +146,9 @@ class PackageManager
           error = createJsonParseError(errorMessage, parseError, stdout)
           return callback(error)
 
-        updatablePackages = (pack for pack in packages when not @getVersionPinnedPackages().includes(pack?.name))
+        updatablePackages = (pack for pack in packages when \
+          not @getVersionPinnedPackages().includes(pack?.name) and \
+          not @getDisabledPackages().includes(pack?.name))
 
         @apmCache.loadOutdated =
           value: updatablePackages
@@ -163,6 +165,9 @@ class PackageManager
         callback(error)
 
     handleProcessErrors(apmProcess, errorMessage, callback)
+
+  getDisabledPackages: ->
+    atom.config.get('core.disabledPackages') ? []
 
   getVersionPinnedPackages: ->
     atom.config.get('core.versionPinnedPackages') ? []
